@@ -14,6 +14,9 @@ public:
     void AddDocument(CTextProcessor* pDoc, Stroka strUrl);
     void SaveToFile(const Stroka& name);
 
+    //---avikulin---
+    Stroka ToStringUTF();
+
     void Reset();
 
 protected:

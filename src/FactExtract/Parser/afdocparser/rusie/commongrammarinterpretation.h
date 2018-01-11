@@ -9,6 +9,11 @@
 #include "tomitaitemsholder.h"
 #include "normalization.h"
 
+//---avikulin---
+//---Add logging dependancies
+#include <library/tracer/CTracer.h>
+#include <util/stream/str.h>
+using namespace ExceptionTrace;
 
 typedef ymap< Stroka, yvector<CFactFields> > CFactSubsets;
 

@@ -41,6 +41,7 @@ SRCS(
     afdocrusie.cpp
     ../rusie/gztwrapper.cpp
     ../rusie/afdocplaintextwriter.cpp
+    ../rusie/afdocjsonwriter.cpp #--avikulin
     ../rusie/leadgenerator.cpp
     ../rusie/prettysitwriter.cpp
     ../rusie/multiwordcreator.cpp

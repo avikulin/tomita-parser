@@ -10,7 +10,12 @@
 #include <FactExtract/Parser/afdocparser/afdocrusparserielib/afdocrusie.h>
 #include <FactExtract/Parser/afdocparser/rusie/factsxmlwriter.h>
 #include <FactExtract/Parser/afdocparser/rusie/afdocplaintextwriter.h>
+//--avikulin---
+//--добавлен класс-адаптер вывода фактов в JSON-файл
+#include <FactExtract/Parser/afdocparser/rusie/afdocjsonwriter.h>
+#include <library/tracer/CTracer.h>
 
+using namespace ExceptionTrace;
 
 
 class CSimpleProcessor {

@@ -12,6 +12,16 @@
     #define HAVE_BACKTRACE
 #endif
 
+
+//--avikulin--
+//--updated by #define|#end block below
+// #if !defined(HAVE_BACKTRACE) && defined(__GNUC__)
+//     #define USE_GCC_BACKTRACE
+//     #define HAVE_BACKTRACE
+// #endif
+
+//--avikulin--
+//--add conf for Linux and GCC stack--
 #if !defined(HAVE_BACKTRACE) && defined(__GNUC__)
     #define USE_GCC_BACKTRACE
     #define HAVE_BACKTRACE
@@ -98,8 +108,9 @@ size_t BackTrace(void**, size_t) {
     return 0;
 }
 #endif
-
-#if defined(_unix_)
+//---avikulin--
+//---add linux platform to use GCC backtrace
+#if defined(_unix_) || defined(_linux_)
 #include <util/generic/strfcpy.h>
 
 #include <dlfcn.h>

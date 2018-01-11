@@ -352,3 +352,18 @@ void CPrettyWriter::SaveToFile(const Stroka& name)
     xmlFree(buff);
 }
 
+//---avikulin---
+//----add new method for string output in UTF-8 
+Stroka CPrettyWriter::ToStringUTF()
+{
+    TXslTransform t(*GetAfDumpXsl().Get());
+
+    xmlChar *buff;
+    int buffsize;
+
+    xmlDocDumpFormatMemoryEnc(m_piDoc.Get(), &buff, &buffsize,"UTF-8",1);
+    TMemoryInput i((const char*)buff, buffsize);
+    xmlFree(buff);
+    
+    return i.ReadAll();
+}

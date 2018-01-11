@@ -102,10 +102,13 @@ ECharset CCommonParm::ParseEncoding(const Stroka& encodingName) const {
 
 void CCommonParm::WriteToLog(const TStringBuf& str) {
     Clog << str << Endl;
-    if (m_LogFile.IsOpen()) {
-        m_LogFile.Write(~str, +str);
-        m_LogFile.Write("\n", 1);
-    }
+    //---avikulin---
+    //---make logging safety
+
+    // if (m_LogFile.IsOpen()) {
+    //     m_LogFile.Write(~str, +str);
+    //     m_LogFile.Write("\n", 1);
+    // }
 }
 
 void CCommonParm::AnalizeParameter(const TStringBuf&) {
@@ -246,7 +249,10 @@ Stroka CCommonParm::GetOutputFormat() const {
 
             case TTextMinerConfig::TOutputParams::mapreduce:
                 return Stroka("mapreduce");
-
+            //---avikulin---
+            //---add "rest" format
+            case TTextMinerConfig::TOutputParams::rest:
+                return Stroka("rest");
             default:
                 ythrow yexception() << "This type of input isn't supported";
         }
@@ -462,6 +468,14 @@ bool CCommonParm::ParseConfig(const Stroka& fn) {
                         if (m_strInputFileName.empty())
                             ythrow yexception() << "Please specify Input\\File field in configuration file in order to read Yandex archive.";
                         m_strSourceType = "yarchive";
+                        break;
+                    
+                    //---avikulin---
+                    //---Add REST-mode params---
+                    case TTextMinerConfig::TInputParams::rest:
+                        if (!m_strInputFileName.empty())
+                            ythrow yexception() << "There should be no input files for REST-mode. All interoperability will work through requests to library functions.";
+                        m_strSourceType = "rest";
                         break;
 
                     default:

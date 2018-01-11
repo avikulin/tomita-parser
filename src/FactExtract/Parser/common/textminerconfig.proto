@@ -15,6 +15,7 @@ message TTextMinerConfig {
       tar = 4;
       som = 5;
       yarchive = 6;
+      rest = 7;//---avikulin---Added for RESR-service interop.
     }
 
     optional string File = 1 [default = ""];
@@ -60,6 +61,7 @@ message TTextMinerConfig {
       proto = 2;
       mapreduce = 3;
       json = 4;
+      rest = 5;//---avikulin---Added for RESR-service interop.
     }
     
     optional string File = 1 [default = ""];

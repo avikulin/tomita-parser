@@ -12,7 +12,10 @@
 #include <util/generic/hash.h>
 #include <util/generic/intrlist.h>
 
-
+//---avikulin---
+//---Add dependancies for logging
+#include <library/tracer/CTracer.h>
+using namespace ExceptionTrace;
 
 
 class TTomitaGeoHierarchy {    // using non thread-safe impl, as it is always local object
@@ -122,14 +125,28 @@ void CTomitaItemsHolder::RunParser(CInputSequenceGLR& InputSequenceGLR, yvector<
         occurrences.erase(it, occurrences.end());
         return;
     }
+    //---avikulin---
+    //---add some logging---
+    TStringStream* s = new TStringStream();
+    yvector<COccurrence> dropped;
+    SolveAmbiguity(occurrences, dropped);
+    PrintOccurrences(*s, occurrences, dropped);
+    
+    CTracer::WriteDebug(s->Str());
+    
+    delete s;
 
     //  then we should apply longest match algorithm ("SolveAmbiguity")
     if (NULL != CGramInfo::s_PrintRulesStream) {
-        yvector<COccurrence> dropped;
-        SolveAmbiguity(occurrences, dropped);
-        PrintOccurrences(*CGramInfo::s_PrintRulesStream, occurrences, dropped);
+        //---avikulin--
+        //yvector<COccurrence> dropped;
+        //SolveAmbiguity(occurrences, dropped);
+        //PrintOccurrences(*CGramInfo::s_PrintRulesStream, occurrences, dropped);
+        *(CGramInfo::s_PrintRulesStream)<<s->Str();
     } else
         SolveAmbiguity(occurrences);
+
+    
 }
 
 void CTomitaItemsHolder::FreeParser(CInputSequenceGLR& InputSequenceGLR)

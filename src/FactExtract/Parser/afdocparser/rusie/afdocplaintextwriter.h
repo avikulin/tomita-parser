@@ -15,7 +15,17 @@ public:
     bool m_bPrintFileDelimiter;
 
     CAfDocPlainTextWriter(const Stroka& strFileName, ECharset encoding, const CParserOptions::COutputOptions& OutputOptions);
-    void AddDocument(CTextProcessor* pDoc);
+    
+    //---avikulin---
+    //---метод сделан виртуальным для расширения в CAfDocJSONWriter 
+    virtual ~CAfDocPlainTextWriter(){};
+
+    //---avikulin---
+    //---методы сделаны виртуальными для расширения в CAfDocJSONWriter 
+    virtual void AddDocument(CTextProcessor* pDoc);
+    virtual void AddDocument(CTextProcessor* pText, TOutputStream* out);
+
+
     void SetFileName(const Stroka& s);
     void SetEncoding(ECharset encoding) {
         YASSERT(encoding != CODES_UNKNOWN);
@@ -35,6 +45,8 @@ protected:
     }
 
     Stroka GetWords(CWordSequence& wordsPair, CSentence* pSent);
-    void AddDocument(CTextProcessor* pText, TOutputStream* out);
-    Stroka AddWS(CWordSequence* pWS, CSentence* pSent);
+    
+    //---avikulin---
+    //---метод сделан виртуальным для расширения в CAfDocJSONWriter 
+    virtual Stroka AddWS(CWordSequence* pWS, CSentence* pSent);
 };

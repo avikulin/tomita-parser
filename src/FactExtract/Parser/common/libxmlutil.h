@@ -223,8 +223,6 @@ public:
         xmlSaveFileEnc(file.c_str(), Get(), NameByCharset(encoding));
     }
 
-
-
     void Reset(const char* version) {
         TBase::Reset(xmlNewDoc((const xmlChar*)version));
     }

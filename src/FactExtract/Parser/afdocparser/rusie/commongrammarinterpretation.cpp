@@ -496,6 +496,16 @@ void CCommonGrammarInterpretation::LogRule(size_t SymbolNo, size_t /*iFirstItemN
         *m_pLogStream << msg << "\n";
         *m_pLogStream << "\n";
     }
+    //---avikulin---
+    //---add logging---
+    TStringStream* s = new TStringStream();
+    PrintFlatRule(*s, SymbolNo, iSynMainItemNo, children);
+    if(msg){
+        CTracer::WriteDebug(Substitute("$0: [$1]",msg, s->Str()));
+    } else {
+        CTracer::WriteDebug(s->Str());
+    }
+    delete s;
 };
 
 CInputItem* CCommonGrammarInterpretation::CreateNewItem(size_t SymbolNo, const CRuleAgreement& agreements,
@@ -516,7 +526,9 @@ CInputItem* CCommonGrammarInterpretation::CreateNewItem(size_t SymbolNo, const C
         LogRule(SymbolNo, iFirstItemNo, iLastItemNo, iSynMainItemNo, children);
 */
     if (!ReduceCheckConstraintSet(&constr)) {
-        if (m_bLog) {
+        //---avikulin--
+        //---add safety logging---
+        //if (m_bLog) {
             Stroka msg = ">> FAILED";
             if (agreements.size() > 0) {
                 msg += ":\n";
@@ -524,7 +536,7 @@ CInputItem* CCommonGrammarInterpretation::CreateNewItem(size_t SymbolNo, const C
                     msg += Stroka("        ") + GetAgreementStr(agreements[i], CGramInfo::s_DebugEncoding) + "\n";
             }
             LogRule(SymbolNo, iFirstItemNo, iLastItemNo, iSynMainItemNo, children, msg);
-        }
+        //}
         return NULL;
     }
 
@@ -556,7 +568,9 @@ CInputItem* CCommonGrammarInterpretation::CreateNewItem(size_t SymbolNo, const C
             child_grammems.insert(psyngroup->GetGrammems().All());
             if (!MergeFactGroups(pNewGroup->m_Facts, psyngroup->m_Facts, child_grammems,
                                   CWordSequenceWithAntecedent::eEllipseCount)) {
-                if (m_bLog)
+                //---avikulin--
+                //---add safety logging---
+                //if (m_bLog)
                     LogRule(SymbolNo, iFirstItemNo, iLastItemNo, iSynMainItemNo, children, ">> not passed merging");
                 return NULL;
             }
@@ -564,8 +578,9 @@ CInputItem* CCommonGrammarInterpretation::CreateNewItem(size_t SymbolNo, const C
     }
 
     MiddleInterpretation(pNewGroup->m_Facts, children);
-
-    if (m_bLog) {
+    //---avikulin--
+    //---add safety logging---
+    //if (m_bLog) {
         Stroka msg;
         if (agreements.size() > 0)
             for (size_t i = 0; i < agreements.size(); i++) {
@@ -579,7 +594,7 @@ CInputItem* CCommonGrammarInterpretation::CreateNewItem(size_t SymbolNo, const C
                 msg += agrStr + '\n';
             }
         LogRule(SymbolNo, iFirstItemNo, iLastItemNo, iSynMainItemNo, children, msg);
-    }
+    //}
 
     return pNewGroup.Release();
 }

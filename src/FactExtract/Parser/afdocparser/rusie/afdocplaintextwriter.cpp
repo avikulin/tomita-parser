@@ -19,6 +19,7 @@ void CAfDocPlainTextWriter::SetAppend(bool bAppend)
     m_bAppend = bAppend;
 }
 
+
 void CAfDocPlainTextWriter::AddDocument(CTextProcessor* pText, TOutputStream* out)
 {
   for (size_t i = 0; i < pText->GetSentenceCount(); i++) {

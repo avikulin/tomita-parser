@@ -1,0 +1,18 @@
+message TTracerMessage {
+    
+    enum EventType {
+                        trace = 0;
+                        warning = 1;
+                        error = 2;
+                        exception = 3;
+                    }
+    
+    required string nodeName = 1;
+    required string userName = 2;
+    required string version = 3;
+    required EventType level = 4;
+    required string event_date_time = 5;
+    required string message = 6;
+    optional string message_data = 7;
+
+}

@@ -3,10 +3,16 @@
 #include "processor.h"
 #include <FactExtract/Parser/common/smartfilefind.h>
 
+// //--avikulin
+#include <library/tracer/CTracer.h>
+
 #ifdef _win_
 #include <fcntl.h>
 #include <io.h>
 #endif //_win_
+
+//---avikulin---
+using namespace ExceptionTrace;
 
 CProcessor::CProcessor()
     : Retriever(NULL)
@@ -57,6 +63,9 @@ bool CProcessor::Init(int argc, char* argv[])
             !Factory.CreateStreamRetriever(m_Parm)) {
 
                 WriteInformation("Bad parameters.\n" + m_Parm.m_strError);
+                //---avikulin---
+                CTracer::WriteFatal(Substitute("Bad parameters. Details: $0", m_Parm.m_strError));
+                
                 return false;
         }
 
@@ -115,7 +124,9 @@ bool CProcessor::Init(int argc, char* argv[])
             }
         }
 
-        if (!m_Parm.GetPrettyOutputFileName().empty())
+        //---avikulin---
+        //---add safety logging---
+        //if (!m_Parm.GetPrettyOutputFileName().empty())
             PrettyXMLWriter.Reset(new CPrettySitWriter(m_Parm.GetOutputEncoding(), *(ParserOptionsPtr.Get())));
 
         TextMiner.Reset(new TMtpTextMiner(m_Parm.GetLanguage(), this, this, ParserOptionsPtr, m_Parm.GetJobCount()));
@@ -125,6 +136,7 @@ bool CProcessor::Init(int argc, char* argv[])
 
     } catch (...) {
         (*Errors) << "Error in CProcessor::Init: " << CurrentExceptionMessage() << Endl;
+        CTracer::WriteError(Substitute("Error in CProcessor::Init: $0", CurrentExceptionMessage()));
         return false;
     }
 
@@ -143,6 +155,13 @@ void CProcessor::InitOutput(const CCommonParm& params)
         PlainTextWriter.Reset(new CAfDocPlainTextWriter(params.GetOutputFileName(), params.GetOutputEncoding(), ParserOptionsPtr->m_ParserOutputOptions));
         PlainTextWriter->SetAppend(params.IsAppendFdo());
         PlainTextWriter->SetFileName(params.GetOutputFileName());
+    } else if ("rest" == params.GetOutputFormat()) {
+        //---avikulin----
+        //---вывод фактов в формате JSON через отделный адаптер CAfDocJSONWriter
+        PlainTextWriter.Reset(new CAfDocJSONWriter(params.GetOutputFileName(), params.GetOutputEncoding(), ParserOptionsPtr->m_ParserOutputOptions));
+        PlainTextWriter->SetAppend(params.IsAppendFdo());
+        PlainTextWriter->SetFileName(params.GetOutputFileName());
+
     } else if ("proto" == params.GetOutputFormat() || "json" == params.GetOutputFormat()) {
         ProtoWriter.Reset(new CFactsProtoWriter(ParserOptionsPtr->m_ParserOutputOptions, params.GetOutputFileName(), params.IsAppendFdo(), params.IsWriteLeads(), params.IsCollectEqualFacts()));   // stream mode
         if ("json" == params.GetOutputFormat())
@@ -180,6 +199,9 @@ void CProcessor::PrintSpeed(Stroka strUrl)
         suTime = Sprintf("Time:%s Doc:%lu Vol:%.2fMb Speed:%.0fMb/h (%s), Used sentences:%.2f%%",
             intervalTime.c_str(), DocCount, vm, speed, strUrl.c_str(), iTouchedSents);
         Clog << suTime << '\r';
+
+        //--avikulin--
+        CTracer::WriteDebug(suTime);        
     }
 }
 
@@ -192,6 +214,8 @@ void CProcessor::WriteInformation(const Stroka& s)
     else
         msg = Substitute("[$0] - $1  (Processing files.)", t.Format("%d:%m:%y %H:%M:%S"), s);
     m_Parm.WriteToLog(msg);
+    //---avikulin---
+    CTracer::WriteDebug(msg);
 }
 
 Wtroka CProcessor::GetInterviewFio(Stroka strUrl) const
@@ -212,19 +236,37 @@ bool CProcessor::Run()
     try {
         StartTime = time(&StartTime);
         WriteInformation("Start.");
+        //---avikulin---
+        CTracer::WriteInfo("Start processing");
 
         TextMiner->Run();
 
         WriteInformation("End.");
+        //---avikulin---
+        CTracer::WriteInfo("End processing");
 
-        if (PrettyXMLWriter.Get() != NULL)
-            PrettyXMLWriter->SaveToFile(m_Parm.GetPrettyOutputFileName());
+        if (PrettyXMLWriter.Get() != NULL){
+            //---avikulin---
+            //---Make logging more safety
+            Stroka fName = m_Parm.GetPrettyOutputFileName();
+            if (+fName>0){
+                PrettyXMLWriter->SaveToFile(m_Parm.GetPrettyOutputFileName());
+            }
+        }
+        
+        //---avikulin---
+        //---Output sematic rules history to log (in HTML form).
+        //m_Parm.WriteToLog("\n"); -- cause error
 
-        m_Parm.WriteToLog("\n");
+        CTracer::WriteDebug(PrettyXMLWriter->ToStringUTF());
+        
         return true;
 
     } catch (...) {
         WriteInformation(Substitute("Fatal error: $0", CurrentExceptionMessage()));
+        
+        //---avikulin--
+        CTracer::WriteFatal(Substitute("Fatal error: $0", CurrentExceptionMessage()));
         return false;
     }
 }
@@ -250,6 +292,9 @@ bool CProcessor::NextDocument(Wtroka& text, SDocumentAttribtes& docAttr, ETypeOf
                 continue;
         } catch (...) {
             Cerr << "Cannot read document from input: " << docAttr.DebugString() << Endl;
+            //---avikulin--
+            CTracer::WriteFatal(Substitute("Cannot read document from input: $0", CurrentExceptionMessage()));
+
             continue;
         }
 

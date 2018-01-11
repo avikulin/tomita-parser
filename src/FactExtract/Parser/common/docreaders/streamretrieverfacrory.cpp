@@ -3,6 +3,10 @@
 #include "streamretrieverfacrory.h"
 #include "tararchivereader.h"
 
+//---avikulin-- Added for debugging purposes only
+#include <unistd.h>
+#include <iostream>
+#define GetCurrentDir getcwd
 
 CStreamRetrieverFactory::CStreamRetrieverFactory()
     : m_sourceType(UndefSource)
@@ -98,13 +102,24 @@ bool CStreamRetrieverFactory::CreateDirStreamRetriever(const CCommonParm& parm) 
 bool CStreamRetrieverFactory::CreateStreamRetriever(const CCommonParm& parm)
 {
     yset<int> unloadDocNums;
+    //---avikulin---
+    //---Desc: Getting current working dir of the executable--
+    char currentDirectory[FILENAME_MAX];
+    
+    if (!GetCurrentDir(currentDirectory, sizeof(currentDirectory)))
+     {
+            ythrow yexception() << "Filed on GetCurrentDir()";
+     }
+
+    currentDirectory[sizeof(currentDirectory) - 1] = '\0';
+    //---avikulin---
 
     if (!parm.GetInputFileName().empty()) {
         if (("tar" == parm.GetSourceType() || "som" == parm.GetSourceType()
             || "arcview" == parm.GetSourceType() || "dpl" == parm.GetSourceType()
             || "mapreduce" == parm.GetSourceType())
             && !PathHelper::Exists(parm.GetInputFileName()))
-            ythrow yexception() << "File \"" << parm.GetInputFileName() << "\" doesn't exists.";
+            ythrow yexception() << "File \"" << parm.GetInputFileName() << "\" doesn't exists. [The current directory:"<<currentDirectory<<"]";
 
         if (!PathHelper::IsDir(parm.GetInputFileName())
             && "tar" != parm.GetSourceType() && "yarchive" != parm.GetSourceType()

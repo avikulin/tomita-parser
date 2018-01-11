@@ -14,6 +14,10 @@
 
 #include <FactExtract/Parser/simpletextminerlib/simpleprocessor.h>
 
+//--avikulin
+#include <FactExtract/Parser/afdocparser/rusie/afdocjsonwriter.h>
+#include <library/tracer/CTracer.h>
+
 class CProcessor: private ITextMinerInput, private ITextMinerOutput
 {
     friend class TMtpTextMiner;
@@ -25,6 +29,11 @@ public:
     bool Run();
 
     void WriteInformation(const Stroka& s);
+    
+    //---avikulin---
+    std::string GetId();
+    bool IsReady();
+
     CCommonParm m_Parm;
 
 private:

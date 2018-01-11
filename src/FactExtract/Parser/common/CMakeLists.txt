@@ -12,6 +12,7 @@ PEERDIR(
     library/lemmer/dictlib
     library/token
     util/regexp
+    library/tracer #avikulin - adding "CTracer" to build
 )
 
 SRCS(
